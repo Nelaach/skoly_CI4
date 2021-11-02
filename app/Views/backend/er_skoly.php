@@ -19,6 +19,9 @@ position: absolute;
 <div class="container mt-4">
     <div class="d-flex justify-content-end">
         <a href="<?php echo site_url('/create') ?>" class="btn btn-success mb-2">Nová škola</a>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <a href="<?php echo site_url('/create_city') ?>" class="btn btn-success mb-2">Nové město</a>
+
         <div>&nbsp</div>
 
 	</div>

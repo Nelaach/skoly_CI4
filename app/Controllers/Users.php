@@ -1,4 +1,6 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\Skoly;
@@ -26,18 +28,17 @@ class Users extends BaseController
 				]
 			];
 
-			if (! $this->validate($rules, $errors)) {
+			if (!$this->validate($rules, $errors)) {
 				$data['validation'] = $this->validator;
-			}else{
+			} else {
 				$model = new UserModel();
 
 				$user = $model->where('email', $this->request->getVar('email'))
-											->first();
+					->first();
 
 				$this->setUserSession($user);
 				//$session->setFlashdata('success', 'Successful Registration');
 				return redirect()->to('dashboard');
-
 			}
 		}
 
@@ -46,7 +47,8 @@ class Users extends BaseController
 		echo view('templates/footer');
 	}
 
-	private function setUserSession($user){
+	private function setUserSession($user)
+	{
 		$data = [
 			'id' => $user['id'],
 			'firstname' => $user['firstname'],
@@ -59,7 +61,8 @@ class Users extends BaseController
 		return true;
 	}
 
-	public function register(){
+	public function register()
+	{
 		$data = [];
 		helper(['form']);
 
@@ -73,9 +76,9 @@ class Users extends BaseController
 				'password_confirm' => 'matches[password]',
 			];
 
-			if (! $this->validate($rules)) {
+			if (!$this->validate($rules)) {
 				$data['validation'] = $this->validator;
-			}else{
+			} else {
 				$model = new UserModel();
 
 				$newData = [
@@ -88,7 +91,6 @@ class Users extends BaseController
 				$session = session();
 				$session->setFlashdata('success', 'Successful Registration');
 				return redirect()->to('/');
-
 			}
 		}
 
@@ -98,8 +100,9 @@ class Users extends BaseController
 		echo view('templates/footer');
 	}
 
-	public function profile(){
-		
+	public function profile()
+	{
+
 		$data = [];
 		helper(['form']);
 		$model = new UserModel();
@@ -109,31 +112,30 @@ class Users extends BaseController
 			$rules = [
 				'firstname' => 'required|min_length[3]|max_length[20]',
 				'lastname' => 'required|min_length[3]|max_length[20]',
-				];
+			];
 
-			if($this->request->getPost('password') != ''){
+			if ($this->request->getPost('password') != '') {
 				$rules['password'] = 'required|min_length[8]|max_length[255]';
 				$rules['password_confirm'] = 'matches[password]';
 			}
 
 
-			if (! $this->validate($rules)) {
+			if (!$this->validate($rules)) {
 				$data['validation'] = $this->validator;
-			}else{
+			} else {
 
 				$newData = [
 					'id' => session()->get('id'),
 					'firstname' => $this->request->getPost('firstname'),
 					'lastname' => $this->request->getPost('lastname'),
-					];
-					if($this->request->getPost('password') != ''){
-						$newData['password'] = $this->request->getPost('password');
-					}
+				];
+				if ($this->request->getPost('password') != '') {
+					$newData['password'] = $this->request->getPost('password');
+				}
 				$model->save($newData);
 
 				session()->setFlashdata('success', 'Successfuly Updated');
 				return redirect()->to('/profile');
-
 			}
 		}
 
@@ -143,220 +145,239 @@ class Users extends BaseController
 		echo view('templates/footer');
 	}
 
-	public function logout(){
+	public function logout()
+	{
 		session()->destroy();
 		return redirect()->to('/');
 	}
 
 	//--------------------------------------------------------------------
 
-	public function skoly(){
+	public function skoly()
+	{
 		$skoly = new Skoly();
 		$mesta = new Mesta();
-		$data['skoly'] = $skoly -> select('skola.id, skola.nazev as skola, mesto.nazev, obor.nazev as obor, geo-lat, geo-long, pocet_prijatych.pocet as pocet')->join('mesto', 'skola.mesto = mesto.id')->join('pocet_prijatych', 'pocet_prijatych.skola = skola.id', 'left')->join('obor', 'pocet_prijatych.obor = obor.id', 'left')->orderBy('skola')->findAll();
-		$data['mesta'] = $mesta -> orderBy('nazev')->findAll();
+		$data['skoly'] = $skoly->select('skola.id, skola.nazev as skola, mesto.nazev, obor.nazev as obor, geo-lat, geo-long, pocet_prijatych.pocet as pocet')->join('mesto', 'skola.mesto = mesto.id')->join('pocet_prijatych', 'pocet_prijatych.skola = skola.id', 'left')->join('obor', 'pocet_prijatych.obor = obor.id', 'left')->orderBy('skola')->findAll();
+		$data['mesta'] = $mesta->orderBy('nazev')->findAll();
 		echo view('templates/header');
 		echo view('frontend/skoly', $data);
 	}
-	public function erSkoly(){
+	public function erSkoly()
+	{
 
-		if (session()->get('isLoggedIn')) { 
-		$skoly = new Skoly();
-		$mesta = new Mesta();
-		$data['skoly'] = $skoly -> select('skola.id, pocet_prijatych.id as prijati_id, skola.nazev as skola, pocet_prijatych.id as obor_id, mesto.nazev, obor.nazev as obor, geo-lat, geo-long, pocet_prijatych.pocet as pocet')->join('mesto', 'skola.mesto = mesto.id')->join('pocet_prijatych', 'pocet_prijatych.skola = skola.id', 'left')->join('obor', 'pocet_prijatych.obor = obor.id', 'left')->orderBy('skola')->findAll();
-		$data['mesta'] = $mesta -> orderBy('nazev')->findAll();
-		echo view('templates/header');
-		echo view('backend/er_skoly', $data);
-		}
-		else{
-			echo("Bez přihlášení se sem nedostaneš");
-
+		if (session()->get('isLoggedIn')) {
+			$skoly = new Skoly();
+			$mesta = new Mesta();
+			$data['skoly'] = $skoly->select('skola.id, pocet_prijatych.id as prijati_id, skola.nazev as skola, pocet_prijatych.id as obor_id, mesto.nazev, obor.nazev as obor, geo-lat, geo-long, pocet_prijatych.pocet as pocet')->join('mesto', 'skola.mesto = mesto.id')->join('pocet_prijatych', 'pocet_prijatych.skola = skola.id', 'left')->join('obor', 'pocet_prijatych.obor = obor.id', 'left')->orderBy('skola')->findAll();
+			$data['mesta'] = $mesta->orderBy('nazev')->findAll();
+			echo view('templates/header');
+			echo view('backend/er_skoly', $data);
+		} else {
+			echo ("Bez přihlášení se sem nedostaneš");
 		}
 	}
-	public function mapa(){
+	public function mapa()
+	{
 		$skoly = new Skoly();
-		$data['skoly'] = $skoly -> select('skola.id, skola.nazev as skola, mesto.nazev, geo-lat, geo-long')-> orderBy('skola.id')->join('mesto', 'skola.mesto = mesto.id')->findAll();
+		$data['skoly'] = $skoly->select('skola.id, skola.nazev as skola, mesto.nazev, geo-lat, geo-long')->orderBy('skola.id')->join('mesto', 'skola.mesto = mesto.id')->findAll();
 		echo view('templates/header');
 		echo view('frontend/mapa', $data);
-	}	
-    public function create(){
-		if (session()->get('isLoggedIn')) { 
-
-		echo view('templates/header');
-        echo view('backend/add_school');
-		echo view('templates/footer');
 	}
-	else{
-		echo("Bez přihlášení se sem nedostaneš");
+	public function create()
+	{
+		if (session()->get('isLoggedIn')) {
 
-	}
-    }
-     public function store() {
-		if (session()->get('isLoggedIn')) { 
-        $skolyModel = new Skoly();
-		$prijatiModel = new Prijati();
-		//echo "<script>alert('".$skola[0]["id"]."');</script>";
-        $data = [
-            'nazev' => $this->request->getVar('skola'),
-            'mesto'  => $this->request->getVar('mesto'),
-			'geo-lat'  => $this->request->getVar('geo-lat'),
-			'geo-long'  => $this->request->getVar('geo-long')
-
-       ];
-	   $skola_nazev = $skolyModel -> select('nazev', 'mesto')-> where('nazev', $this->request->getVar('skola'))-> where('mesto', $this->request->getVar('mesto'))-> findAll();
-	   if(!$skola_nazev){
-		$skolyModel->insert($data);
-	   }
-
-	   $skola_id = $skolyModel -> select('id')-> where('nazev', $this->request->getVar('skola'))-> findAll();
-	   $id = $skola_id[0]["id"];
-	   $data1 = [
-		   	'obor'  => $this->request->getVar('obor'),
-			'prijati'  => $this->request->getVar('prijati'),
-			'pocet'  => $this->request->getVar('pocet'),
-			'skola' => $id,
-	   ];
-
-	   //echo "<script>alert('".$this->request->getVar('mesto')."');</script>";
-        //return $this->response->redirect(site_url('/uvodni'));
-		if ($prijatiModel->insert($data1))
-		{
-			?><style>.center {text-align: center;color: red;}</style><?php
-			echo "<h3 class='center'>Úspěšně přidáno</h3>";
-			return $this->response->redirect(site_url('/erSkoly'));
-
+			echo view('templates/header');
+			echo view('backend/add_school');
+			echo view('templates/footer');
+		} else {
+			echo ("Bez přihlášení se sem nedostaneš");
 		}
-		else 
-		{
-			echo "nepřidáno";
-		}	
 	}
-	else{
-		echo("Bez přihlášení se sem nedostaneš");
+	public function store()
+	{
+		if (session()->get('isLoggedIn')) {
+			$skolyModel = new Skoly();
+			$prijatiModel = new Prijati();
+			//echo "<script>alert('".$skola[0]["id"]."');</script>";
+			$data = [
+				'nazev' => $this->request->getVar('skola'),
+				'mesto'  => $this->request->getVar('mesto'),
+				'geo-lat'  => $this->request->getVar('geo-lat'),
+				'geo-long'  => $this->request->getVar('geo-long')
 
-	}	
-    }
+			];
+			$skola_nazev = $skolyModel->select('nazev', 'mesto')->where('nazev', $this->request->getVar('skola'))->where('mesto', $this->request->getVar('mesto'))->findAll();
+			if (!$skola_nazev) {
+				$skolyModel->insert($data);
+			}
 
-    // show single user
-    public function edit($obor){
-		if (session()->get('isLoggedIn')) { 
+			$skola_id = $skolyModel->select('id')->where('nazev', $this->request->getVar('skola'))->findAll();
+			$id = $skola_id[0]["id"];
+			$data1 = [
+				'obor'  => $this->request->getVar('obor'),
+				'prijati'  => $this->request->getVar('prijati'),
+				'pocet'  => $this->request->getVar('pocet'),
+				'skola' => $id,
+			];
 
-		if($obor == null) {
+			//echo "<script>alert('".$this->request->getVar('mesto')."');</script>";
+			//return $this->response->redirect(site_url('/uvodni'));
+			if ($prijatiModel->insert($data1)) {
+?><style>
+					.center {
+						text-align: center;
+						color: red;
+					}
+				</style><?php
+						echo "<h3 class='center'>Úspěšně přidáno</h3>";
+						return $this->response->redirect(site_url('/erSkoly'));
+					} else {
+						echo "nepřidáno";
+					}
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+			public function create_city()
+			{
+				if (session()->get('isLoggedIn')) {
 
-			echo "hello";
+					echo view('templates/header');
+					echo view('backend/add_city');
+					echo view('templates/footer');
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+			public function store_city() {
+
+				if (session()->get('isLoggedIn')) {
+
+
+					$data = [
+						'nazev' => $this->request->getVar('mesto'),
+					];
+
+					$Mesta = new Mesta();
+
+					if ($Mesta->insert($data)) {
+
+						return $this->response->redirect(site_url('/erSkoly'));
+					} else {
+						echo "nepřidáno";
+					}
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+			// show single user
+			public function edit($obor)
+			{
+				if (session()->get('isLoggedIn')) {
+
+					if ($obor == null) {
+
+						echo "hello";
+					}
+					$prijatiModel = new Prijati();
+					$data['prijati'] = $prijatiModel->where('id', $obor)->first();
+					echo view('templates/header');
+					echo view('backend/edit', $data);
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+			public function novyObor($id)
+			{
+				if (session()->get('isLoggedIn')) {
+
+
+					$data1 = [
+						'obor'  => " ",
+						'prijati'  => " ",
+						'pocet'  => " ",
+						'skola' => $id,
+					];
+
+					$prijatiModel = new Prijati();
+
+					if ($prijatiModel->insert($data1)) {
+
+						return $this->response->redirect(site_url('/erSkoly'));
+					} else {
+						echo "nepřidáno";
+					}
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+
+			// update user data
+			public function editZaklad($id = null)
+			{
+				if (session()->get('isLoggedIn')) {
+
+					$skolyModel = new Skoly();
+					$data['skoly'] = $skolyModel->where('id', $id)->first();
+					echo view('templates/header');
+					echo view('backend/edit_zaklad', $data);
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+			public function updateZaklad()
+			{
+				if (session()->get('isLoggedIn')) {
+
+					$skolyModel = new Skoly();
+					$id = $this->request->getVar('id');
+
+					$data = [
+						'nazev' => $this->request->getVar('skola'),
+						'mesto'  => $this->request->getVar('mesto'),
+						'geo-lat'  => $this->request->getVar('geo-lat'),
+						'geo-long'  => $this->request->getVar('geo-long')
+					];
+					$skolyModel->update($id, $data);
+
+					return $this->response->redirect(site_url('/editZaklad/' . $id));
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+
+			public function update()
+			{
+				if (session()->get('isLoggedIn')) {
+
+					$prijatiModel = new Prijati();
+					$prijati_id = $this->request->getVar('prijati_id');
+
+					$data1 = [
+						'obor'  => $this->request->getVar('obor'),
+						'pocet'  => $this->request->getVar('pocet'),
+					];
+					$prijatiModel->update($prijati_id, $data1);
+
+					return $this->response->redirect(site_url('/edit/' . $prijati_id));
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
+
+			// delete user
+			public function delete($id = null)
+			{
+				if (session()->get('isLoggedIn')) {
+
+					$skolyModel = new Skoly();
+					$prijatiModel = new Prijati();
+					$data['skol_del'] = $skolyModel->where('id', $id)->delete($id);
+					$data['prijati_del'] = $prijatiModel->where('skola', $id)->delete($id);
+					return $this->response->redirect(site_url('/erSkoly'));
+				} else {
+					echo ("Bez přihlášení se sem nedostaneš");
+				}
+			}
 		}
-		$prijatiModel = new Prijati();
-        $data['prijati'] = $prijatiModel->where('id', $obor)->first();
-		echo view('templates/header');
-		echo view('backend/edit', $data);
-	}
-		else{
-			echo("Bez přihlášení se sem nedostaneš");
-	
-		}	
-		
-    }
-	public function novyObor($id){
-		if (session()->get('isLoggedIn')) { 
-
-
-		$data1 = [
-				'obor'  => " ",
-			 'prijati'  => " ",
-			 'pocet'  => " ",
-			 'skola' => $id,
-		];
- 
-		$prijatiModel = new Prijati();
-
-		 if ($prijatiModel->insert($data1))
-		 {
-
-			 return $this->response->redirect(site_url('/erSkoly'));
- 
-		 }
-		 else 
-		 {
-			 echo "nepřidáno";
-		 }
-		}	
-		 else {
-			echo("Bez přihlášení se sem nedostaneš");
-	
-		}	
-		
-    }
-
-    // update user data
-	public function editZaklad($id = null){
-		if (session()->get('isLoggedIn')) { 
-
-        $skolyModel = new Skoly();
-        $data['skoly'] = $skolyModel->where('id', $id)->first();
-		echo view('templates/header');
-		echo view('backend/edit_zaklad', $data);
-	}	
-	else {
-	   echo("Bez přihlášení se sem nedostaneš");
-
-   }
-
-	}
-	public function updateZaklad(){
-		if (session()->get('isLoggedIn')) { 
-
-		$skolyModel = new Skoly();
-		$id = $this->request->getVar('id');
-
-        $data = [
-            'nazev' => $this->request->getVar('skola'),
-            'mesto'  => $this->request->getVar('mesto'),
-			'geo-lat'  => $this->request->getVar('geo-lat'),
-			'geo-long'  => $this->request->getVar('geo-long')
-       ];
-    	$skolyModel->update($id, $data);
-
-        return $this->response->redirect(site_url('/editZaklad/'.$id));
-	}	
-	else {
-	   echo("Bez přihlášení se sem nedostaneš");
-
-   }	
-    }
- 
-    public function update(){
-		if (session()->get('isLoggedIn')) { 
-
-		$prijatiModel = new Prijati();
-		$prijati_id = $this->request->getVar('prijati_id');
-
-	   $data1 = [
-		'obor'  => $this->request->getVar('obor'),
-	 	'pocet'  => $this->request->getVar('pocet'),
-];
-		$prijatiModel->update($prijati_id, $data1);
-
-        return $this->response->redirect(site_url('/edit/'.$prijati_id));
-	}	
-	else {
-	   echo("Bez přihlášení se sem nedostaneš");
-
-   }	
-    }
- 
-    // delete user
-    public function delete($id = null){
-		if (session()->get('isLoggedIn')) { 
-
-        $skolyModel = new Skoly();
-		$prijatiModel = new Prijati();
-        $data['skol_del'] = $skolyModel->where('id', $id)->delete($id);
-		$data['prijati_del'] = $prijatiModel->where('skola', $id)->delete($id);
-        return $this->response->redirect(site_url('/erSkoly'));
-	}	
-	else {
-	   echo("Bez přihlášení se sem nedostaneš");
-
-   }
-    }    	
-}

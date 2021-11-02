@@ -28,51 +28,17 @@
 
 <body>
   <div class="container-sm mt-3">
-    <form method="post" id="addname" name="addname" action="/store">
+    <form method="post" id="addname" name="addname" action="/store_city">
       <div class="form-group">
-        <label>Název</label><br>
-        <input type="text" name="skola" id="skola" class="form-control">
-      </div>
-      <label>Město</label><br>
-      <select class="form-control" name="mesto" id="mesto">
-        <?php
-        $query = $db->query("SELECT * FROM mesto");
-        foreach ($query->getResult() as $row) { ?>
-          <option value=<?php echo $row->id ?>> <?php echo $row->nazev;
-                                              } ?></option>
-      </select>
-      <div>&nbsp</div>
-      <label>Obor</label><br>
-
-      <select class="form-control" name="obor">
-      <option> </option>
-
-        <?php
-        $query = $db->query("SELECT * FROM obor");
-        foreach ($query->getResult() as $row) { ?>
-          <option value=<?php echo $row->id ?>> <?php echo $row->nazev;
-                                              } ?></option>
-      </select>
-      <div>&nbsp</div>
-      <div class="form-group">
-        <label>Počet přijatých</label><br>
-        <input type="number" name="pocet" class="form-control">
-      </div>
-
-      <div class="form-group">
-        <label>Geo-lat</label><br>
-        <input type="number" name="geo-lat" class="form-control">
+        <label>Název města</label><br>
+        <input type="text" name="mesto" id="mesto" class="form-control">
       </div>
       <div class="form-group">
-        <label>Geo-long</label><br>
-        <input type="number" name="geo-long" class="form-control">
-      </div>    
-      <div class="form-group">
-        <button type="submit" class="btn btn-success">Přidat</button>
+        <button type="submit" class="btn btn-success">Přidat město</button>
       </div>
-
     </form>
   </div>
+
 </body>
 
 </html>

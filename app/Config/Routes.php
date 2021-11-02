@@ -48,7 +48,9 @@ $routes->match(['get','post'],'updateZaklad', 'Users::updateZaklad');
 
 $routes->get('skoly', 'Users::skoly');
 $routes->get('create', 'Users::create');
+$routes->get('create_city', 'Users::create_city');
 $routes->match(['get','post'],'store', 'Users::store');
+$routes->match(['get','post'],'store_city', 'Users::store_city');
 
 $routes->get('mapa', 'Users::mapa');
 
